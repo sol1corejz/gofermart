@@ -1,0 +1,106 @@
+package storage
+
+import (
+	"database/sql"
+	"errors"
+	"github.com/sol1corejz/gofermart/cmd/config"
+	"github.com/sol1corejz/gofermart/internal/logger"
+	"go.uber.org/zap"
+)
+
+var (
+	DB                     *sql.DB
+	ErrConnectionFailed    = errors.New("db connection failed")
+	ErrCreatingTableFailed = errors.New("creating table failed")
+	ErrAlreadyExists       = errors.New("ссылка уже сокращена")
+)
+
+func Init() error {
+	if config.DatabaseURI != "" {
+
+		db, err := sql.Open("pgx", config.DatabaseURI)
+		if err != nil {
+			logger.Log.Fatal("Error opening database connection", zap.Error(err))
+			return ErrConnectionFailed
+		}
+
+		DB = db
+
+		_, err = DB.Exec(`
+			CREATE TABLE IF NOT EXISTS users (
+				id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+				login VARCHAR(255) UNIQUE NOT NULL,
+				password_hash VARCHAR(255) NOT NULL,
+				created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+			);
+		`)
+
+		_, err = DB.Exec(`
+			CREATE TABLE IF NOT EXISTS orders (
+				id SERIAL PRIMARY KEY,
+				user_id UUID NOT NULL REFERENCES users(id),
+				order_number VARCHAR(255) UNIQUE NOT NULL,
+				status VARCHAR(20) NOT NULL,
+				accrual DECIMAL(10, 2),
+				uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+			);
+		`)
+
+		_, err = DB.Exec(`
+			CREATE TABLE IF NOT EXISTS orders (
+				user_id UUID NOT NULL REFERENCES users(id),
+				current_balance DECIMAL(10, 2) NOT NULL DEFAULT 0,
+				withdrawn_total DECIMAL(10, 2) NOT NULL DEFAULT 0
+			);
+		`)
+
+		_, err = DB.Exec(`
+			CREATE TABLE IF NOT EXISTS withdrawals (
+				id SERIAL PRIMARY KEY,
+				user_id UUID NOT NULL REFERENCES users(id),
+				order_number VARCHAR(255) NOT NULL,
+				sum DECIMAL(10, 2) NOT NULL,
+				processed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+			);
+		`)
+
+		if err != nil {
+			logger.Log.Info("Error creating table", zap.Error(err))
+			return ErrCreatingTableFailed
+		}
+	}
+
+	return ErrConnectionFailed
+}
+
+func GetUserByLogin(login string) (string, error) {
+
+	existingUserID := ""
+
+	err := DB.QueryRow(`
+		SELECT user_id FROM users WHERE login = $1;
+	`, login).Scan(&existingUserID)
+
+	if err != nil {
+		return "", err
+	}
+
+	if existingUserID != "" {
+		return existingUserID, nil
+	}
+
+	return existingUserID, nil
+}
+
+func CreateUser(userID string, login string, passwordHash string) error {
+
+	_, err := DB.Exec(`
+		INSERT INTO users (user_id, login, password_hash) VALUES ($1, $2, $3) ON CONFLICT (user_id) DO NOTHING;
+	`, userID, login, passwordHash)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
