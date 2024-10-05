@@ -6,8 +6,8 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.6.0
-	github.com/sol1corejz/go-url-shortener v0.0.0-20240924071800-02e0cd95f0df
 	go.uber.org/zap v1.27.0
+	golang.org/x/crypto v0.14.0
 )
 
 require (
