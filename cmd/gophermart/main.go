@@ -36,9 +36,7 @@ func run() error {
 
 	app.Post("/api/user/register", handlers.RegisterHandler)
 
-	app.Post("/api/user/login", func(c *fiber.Ctx) error {
-		return nil
-	})
+	app.Post("/api/user/login", handlers.LoginHandler)
 
 	app.Post("/api/user/orders", func(c *fiber.Ctx) error {
 		return nil
