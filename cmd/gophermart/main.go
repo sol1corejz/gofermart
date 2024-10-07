@@ -6,6 +6,7 @@ import (
 	"github.com/sol1corejz/gofermart/cmd/config"
 	"github.com/sol1corejz/gofermart/internal/handlers"
 	"github.com/sol1corejz/gofermart/internal/logger"
+	"github.com/sol1corejz/gofermart/internal/middleware"
 	"github.com/sol1corejz/gofermart/internal/storage"
 	"go.uber.org/zap"
 )
@@ -35,26 +36,20 @@ func run() error {
 	}))
 
 	app.Post("/api/user/register", handlers.RegisterHandler)
-
 	app.Post("/api/user/login", handlers.LoginHandler)
 
-	app.Post("/api/user/orders", func(c *fiber.Ctx) error {
+	authRoutes := app.Group("/api/user", middleware.AuthMiddleware)
+	authRoutes.Get("/orders", handlers.GetOrdersHandler)
+	authRoutes.Post("/orders", func(c *fiber.Ctx) error {
 		return nil
 	})
-
-	app.Get("/api/user/order", func(c *fiber.Ctx) error {
+	authRoutes.Get("/balance", func(c *fiber.Ctx) error {
 		return nil
 	})
-
-	app.Get("/api/user/balance", func(c *fiber.Ctx) error {
+	authRoutes.Post("/balance/withdraw", func(c *fiber.Ctx) error {
 		return nil
 	})
-
-	app.Post("/api/user/balance/withdraw", func(c *fiber.Ctx) error {
-		return nil
-	})
-
-	app.Get("/api/user/withdrawals", func(c *fiber.Ctx) error {
+	authRoutes.Get("/withdrawals", func(c *fiber.Ctx) error {
 		return nil
 	})
 

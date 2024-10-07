@@ -9,7 +9,7 @@ import (
 
 type Claims struct {
 	jwt.RegisteredClaims
-	UserID string
+	UserID uuid.UUID
 }
 
 var UserUUID uuid.UUID
@@ -33,7 +33,7 @@ func BuildJWTString() (string, error) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenExp)),
 		},
 
-		UserID: UserUUID.String(),
+		UserID: UserUUID,
 	})
 
 	tokenString, err := token.SignedString([]byte(SecretKey))
@@ -44,19 +44,19 @@ func BuildJWTString() (string, error) {
 	return tokenString, nil
 }
 
-func GetUserID(tokenString string) string {
+func GetUserID(tokenString string) uuid.UUID {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims,
 		func(t *jwt.Token) (interface{}, error) {
 			return []byte(SecretKey), nil
 		})
 	if err != nil {
-		return ""
+		return uuid.Nil
 	}
 
 	if !token.Valid {
 		logger.Log.Info("Token is not valid")
-		return ""
+		return uuid.Nil
 	}
 
 	logger.Log.Info("Token is valid")
