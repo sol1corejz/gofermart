@@ -169,6 +169,37 @@ func GetUserBalance(ctx context.Context, UUID uuid.UUID) (models.UserBalance, er
 	return balance, nil
 }
 
+func GetUserWithdrawals(ctx context.Context, UUID uuid.UUID) ([]models.Withdrawal, error) {
+	var withdrawals []models.Withdrawal
+
+	rows, err := DB.QueryContext(ctx, `
+		SELECT * FROM withdrawals WHERE user_id = $1;
+	`, UUID)
+
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return []models.Withdrawal{}, err
+		}
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var withdrawal models.Withdrawal
+		err = rows.Scan(&withdrawal.ID, &withdrawal.UserID, &withdrawal.OrderNumber, &withdrawal.Sum, &withdrawal.ProcessedAt)
+		if err != nil {
+			return nil, err
+		}
+		withdrawals = append(withdrawals, withdrawal)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return withdrawals, nil
+}
+
 func CreateWithdrawal(ctx context.Context, userID uuid.UUID, order string, sum float64) error {
 	_, err := DB.ExecContext(ctx, `
 		INSERT INTO withdrawals (user_id, order_number, sum, processed_at) 

@@ -71,3 +71,49 @@ func WithdrawHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusOK)
 	}
 }
+
+type WithdrawalsResponse struct {
+	Order       string    `json:"order"`
+	Sum         float64   `json:"sum"`
+	ProcessedAt time.Time `json:"processed_at"`
+}
+
+func GetWithdrawalsHandler(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	select {
+	case <-ctx.Done():
+		logger.Log.Warn("Context canceled or timeout exceeded")
+		return c.Status(fiber.StatusRequestTimeout).JSON(fiber.Map{
+			"error": "Request timed out",
+		})
+	default:
+		token := c.Cookies("jwt")
+
+		userID := auth.GetUserID(token)
+
+		withdrawals, err := storage.GetUserWithdrawals(ctx, userID)
+
+		if err != nil {
+			logger.Log.Error("Error getting user withdrawals", zap.Error(err))
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+
+		if len(withdrawals) == 0 {
+			logger.Log.Info("No withdrawals found")
+			return c.SendStatus(fiber.StatusNoContent)
+		}
+
+		var response []WithdrawalsResponse
+		for _, withdrawal := range withdrawals {
+			response = append(response, WithdrawalsResponse{
+				Order:       withdrawal.OrderNumber,
+				Sum:         withdrawal.Sum,
+				ProcessedAt: withdrawal.ProcessedAt,
+			})
+		}
+
+		return c.Status(fiber.StatusOK).JSON(response)
+	}
+}

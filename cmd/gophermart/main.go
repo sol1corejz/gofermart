@@ -45,9 +45,7 @@ func run() error {
 	})
 	authRoutes.Get("/balance", handlers.GetUserBalanceHandler)
 	authRoutes.Post("/balance/withdraw", handlers.WithdrawHandler)
-	authRoutes.Get("/withdrawals", func(c *fiber.Ctx) error {
-		return nil
-	})
+	authRoutes.Get("/withdrawals", handlers.GetWithdrawalsHandler)
 
 	logger.Log.Info("Running server", zap.String("address", config.RunAddress))
 	return app.Listen(config.RunAddress)
