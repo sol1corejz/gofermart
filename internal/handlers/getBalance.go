@@ -34,7 +34,7 @@ func GetUserBalanceHandler(c *fiber.Ctx) error {
 
 		if err != nil {
 			logger.Log.Error("Error getting user orders", zap.Error(err))
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
+			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 
 		return c.Status(fiber.StatusOK).JSON(BalanceResponse{

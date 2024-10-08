@@ -11,12 +11,14 @@ import (
 	"github.com/sol1corejz/gofermart/internal/logger"
 	"github.com/sol1corejz/gofermart/internal/models"
 	"go.uber.org/zap"
+	"time"
 )
 
 var (
 	DB                     *sql.DB
 	ErrConnectionFailed    = errors.New("db connection failed")
 	ErrCreatingTableFailed = errors.New("creating table failed")
+	ErrNoSuchOrder         = errors.New("no such order")
 )
 
 func Init() error {
@@ -132,6 +134,24 @@ func GetUserOrders(ctx context.Context, UUID uuid.UUID) ([]models.Order, error) 
 	return orders, nil
 }
 
+func GetOrderByNumber(ctx context.Context, orderNumber string) (models.Order, error) {
+
+	var order models.Order
+
+	err := DB.QueryRowContext(ctx, `
+		SELECT * FROM orders WHERE order_number = $1;
+	`, orderNumber).Scan(&order.ID, &order.UserID, &order.OrderNumber, &order.Status, &order.Accrual, &order.UploadedAt)
+
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return models.Order{}, ErrNoSuchOrder
+		}
+		return models.Order{}, err
+	}
+
+	return order, nil
+}
+
 func GetUserBalance(ctx context.Context, UUID uuid.UUID) (models.UserBalance, error) {
 
 	var balance models.UserBalance
@@ -147,4 +167,25 @@ func GetUserBalance(ctx context.Context, UUID uuid.UUID) (models.UserBalance, er
 	}
 
 	return balance, nil
+}
+
+func CreateWithdrawal(ctx context.Context, userID uuid.UUID, order string, sum float64) error {
+	_, err := DB.ExecContext(ctx, `
+		INSERT INTO withdrawals (user_id, order_number, sum, processed_at) 
+		VALUES ($1, $2, $3, $4)
+	`, userID, order, sum, time.Now())
+	if err != nil {
+		return err
+	}
+
+	_, err = DB.ExecContext(ctx, `
+		UPDATE user_balances 
+		SET current_balance = current_balance - $1, withdrawn_total = withdrawn_total + $1 
+		WHERE user_id = $2
+	`, sum, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

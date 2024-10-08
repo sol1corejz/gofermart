@@ -44,9 +44,7 @@ func run() error {
 		return nil
 	})
 	authRoutes.Get("/balance", handlers.GetUserBalanceHandler)
-	authRoutes.Post("/balance/withdraw", func(c *fiber.Ctx) error {
-		return nil
-	})
+	authRoutes.Post("/balance/withdraw", handlers.WithdrawHandler)
 	authRoutes.Get("/withdrawals", func(c *fiber.Ctx) error {
 		return nil
 	})
