@@ -40,9 +40,7 @@ func run() error {
 
 	authRoutes := app.Group("/api/user", middleware.AuthMiddleware)
 	authRoutes.Get("/orders", handlers.GetOrdersHandler)
-	authRoutes.Post("/orders", func(c *fiber.Ctx) error {
-		return nil
-	})
+	authRoutes.Post("/orders", handlers.CreateOrderHandler)
 	authRoutes.Get("/balance", handlers.GetUserBalanceHandler)
 	authRoutes.Post("/balance/withdraw", handlers.WithdrawHandler)
 	authRoutes.Get("/withdrawals", handlers.GetWithdrawalsHandler)
