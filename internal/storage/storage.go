@@ -42,10 +42,10 @@ func Init() error {
 		);`,
 		`CREATE TABLE IF NOT EXISTS orders (
 			id SERIAL PRIMARY KEY,
-			user_id UUID NOT NULL REFERENCES users(id),
+			user_id UUID REFERENCES users(id),
 			order_number VARCHAR(255) UNIQUE NOT NULL,
 			status VARCHAR(20) NOT NULL,
-			accrual DECIMAL(10, 2) DEFAULT 0.00,
+			accrual DECIMAL(10, 2) DEFAULT 0,
 			uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);`,
 		`CREATE TABLE IF NOT EXISTS user_balances (
