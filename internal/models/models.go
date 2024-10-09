@@ -5,6 +5,13 @@ import (
 	"time"
 )
 
+var (
+	REGISTERED = "REGISTERED"
+	INVALID    = "INVALID"
+	PROCESSING = "PROCESSING"
+	PROCESSED  = "REGISTERED"
+)
+
 type User struct {
 	ID           uuid.UUID `db:"id"`
 	Login        string    `db:"login"`
