@@ -70,20 +70,20 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 			logger.Log.Info("Order number already exists")
 			return c.Status(fiber.StatusConflict).SendString("Order number already exists")
 		}
+
 		if err != nil {
 			if errors.Is(err, storage.ErrNoSuchOrder) {
 				err = storage.CreateOrder(ctx, userID.String(), string(orderNumber))
 				if err != nil {
-					logger.Log.Error("Error creating order")
 					return c.Status(fiber.StatusInternalServerError).SendString("Error creating order")
 				}
 				return c.Status(fiber.StatusAccepted).SendString("Order created")
 			}
-			logger.Log.Error("Error checking order")
-			return c.Status(fiber.StatusInternalServerError).SendString("Error checking order")
+
+			logger.Log.Error("Error creating order")
+			return c.Status(fiber.StatusInternalServerError).SendString("Error creating order")
 		}
 
-		logger.Log.Error("Error creating order")
-		return c.Status(fiber.StatusInternalServerError).SendString("Error creating order")
+		return nil
 	}
 }

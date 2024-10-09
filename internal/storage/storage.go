@@ -101,11 +101,13 @@ func CreateUser(ctx context.Context, userID string, login string, passwordHash s
 }
 
 func CreateOrder(ctx context.Context, userID string, orderNumber string) error {
+
 	_, err := DB.ExecContext(ctx, `
-		INSERT INTO orders (user_id, order_number, status) VALUES ($1, $2, $3);
-	`, userID, orderNumber, models.PROCESSING)
+        INSERT INTO orders (user_id, order_number, status) VALUES ($1, $2, $3);
+    `, userID, orderNumber, models.PROCESSING)
 
 	if err != nil {
+		logger.Log.Error("Error creating order: %v", zap.Error(err))
 		return err
 	}
 
@@ -153,7 +155,7 @@ func GetOrderByNumber(ctx context.Context, orderNumber string) (models.Order, er
 	`, orderNumber).Scan(&order.ID, &order.UserID, &order.OrderNumber, &order.Status, &order.Accrual, &order.UploadedAt)
 
 	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, sql.ErrNoRows) {
 			return models.Order{}, ErrNoSuchOrder
 		}
 		return models.Order{}, err
