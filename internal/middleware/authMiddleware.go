@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/sol1corejz/gofermart/internal/logger"
-	"github.com/sol1corejz/gofermart/internal/tokenStorage"
+	"github.com/sol1corejz/gofermart/internal/tokenstorage"
 )
 
 func AuthMiddleware(c *fiber.Ctx) error {
@@ -15,7 +15,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		})
 	}
 
-	isValid := tokenStorage.CheckToken(token)
+	isValid := tokenstorage.CheckToken(token)
 
 	if !isValid {
 		logger.Log.Error("Token validation failed")

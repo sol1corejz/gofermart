@@ -23,8 +23,8 @@ func ParseFlags() {
 	if envRunAddr := os.Getenv("RUN_ADDRESS"); envRunAddr != "" {
 		RunAddress = envRunAddr
 	}
-	if databaseUri := os.Getenv("DATABASE_URI"); databaseUri != "" {
-		DatabaseURI = databaseUri
+	if databaseURI := os.Getenv("DATABASE_URI"); databaseURI != "" {
+		DatabaseURI = databaseURI
 	}
 	if accrualAddress := os.Getenv("ACCRUAL_SYSTEM_ADDRESS"); accrualAddress != "" {
 		AccrualSystemAddress = accrualAddress
