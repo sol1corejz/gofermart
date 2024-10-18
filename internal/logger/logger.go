@@ -2,6 +2,7 @@ package logger
 
 import (
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 var Log = zap.NewNop()
@@ -14,6 +15,16 @@ func Initialize(level string) error {
 	}
 
 	cfg := zap.NewProductionConfig()
+
+	cfg.EncoderConfig = zapcore.EncoderConfig{
+		TimeKey:       "ts",
+		LevelKey:      "level",
+		NameKey:       "logger",
+		CallerKey:     "caller",
+		MessageKey:    "msg",
+		StacktraceKey: "stacktrace",
+		LineEnding:    zapcore.DefaultLineEnding,
+	}
 
 	cfg.Level = lvl
 
