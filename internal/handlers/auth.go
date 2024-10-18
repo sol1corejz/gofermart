@@ -90,6 +90,7 @@ func RegisterHandler(c *fiber.Ctx) error {
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"message": "User registered successfully",
+			"token":   token,
 		})
 	}
 }
@@ -157,6 +158,7 @@ func LoginHandler(c *fiber.Ctx) error {
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"message": "User authorized successfully",
+			"token":   token,
 		})
 	}
 }
