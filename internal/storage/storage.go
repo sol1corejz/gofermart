@@ -105,7 +105,7 @@ func CreateOrder(ctx context.Context, userID string, orderNumber string) error {
 
 	_, err := DB.ExecContext(ctx, `
         INSERT INTO orders (user_id, order_number, status) VALUES ($1, $2, $3) ON CONFLICT (order_number) DO NOTHING;
-    `, userID, orderNumber, models.PROCESSING)
+    `, userID, orderNumber, models.NEW)
 
 	if err != nil {
 		logger.Log.Error("Error creating order: %v", zap.Error(err))
@@ -214,7 +214,7 @@ func GetUserWithdrawals(ctx context.Context, UUID uuid.UUID) ([]models.Withdrawa
 }
 
 func CreateWithdrawal(ctx context.Context, userID uuid.UUID, order string, sum float64) error {
-	tx, err := DB.BeginTx(ctx, nil) // Начинаем транзакцию
+	tx, err := DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -239,6 +239,46 @@ func CreateWithdrawal(ctx context.Context, userID uuid.UUID, order string, sum f
 	}
 
 	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetAllOrders(ctx context.Context) ([]models.Order, error) {
+	var orders []models.Order
+
+	rows, err := DB.QueryContext(ctx, `
+		SELECT * FROM orders;
+	`)
+
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return []models.Order{}, err
+		}
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var order models.Order
+		err = rows.Scan(&order.ID, &order.UserID, &order.OrderNumber, &order.Status, &order.Accrual, &order.UploadedAt)
+		if err != nil {
+			return nil, err
+		}
+		orders = append(orders, order)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}
+
+func UpdateOrder(ctx context.Context, orderID int, orderStatus string, orderAccrual float64) error {
+	_, err := DB.ExecContext(ctx, `UPDATE orders SET status = $1, accrual = $2 WHERE id = $3`, orderStatus, orderAccrual, orderID)
 	if err != nil {
 		return err
 	}

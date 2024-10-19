@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	NEW        = "NEW"
 	REGISTERED = "REGISTERED"
 	INVALID    = "INVALID"
 	PROCESSING = "PROCESSING"

@@ -8,6 +8,7 @@ import (
 	"github.com/sol1corejz/gofermart/internal/logger"
 	"github.com/sol1corejz/gofermart/internal/middleware"
 	"github.com/sol1corejz/gofermart/internal/storage"
+	"github.com/sol1corejz/gofermart/internal/workers"
 	"go.uber.org/zap"
 )
 
@@ -22,6 +23,8 @@ func main() {
 		logger.Log.Error("Failed to init storage", zap.Error(err))
 		return
 	}
+
+	workers.InitLoyaltySystem()
 
 	if err := run(); err != nil {
 		logger.Log.Fatal("Failed to run server", zap.Error(err))
