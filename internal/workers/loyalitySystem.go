@@ -23,7 +23,7 @@ type LoyaltyResponse struct {
 
 const ExternalLoyaltyServiceURL = "http://localhost:8080/api/orders/"
 
-const WorkerInterval = 1 * time.Minute
+const WorkerInterval = 5 * time.Second
 
 func InitLoyaltySystem() {
 	go startWorker()
