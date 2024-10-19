@@ -1,16 +1,24 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sol1corejz/gofermart/internal/auth"
 	"github.com/sol1corejz/gofermart/internal/logger"
 	"github.com/sol1corejz/gofermart/internal/storage"
 	"go.uber.org/zap"
+	"net/http"
 	"regexp"
 	"time"
 )
+
+type Order struct {
+	OrderNumber string `json:"order"`
+}
 
 var luhnCheck = regexp.MustCompile(`^\d+$`)
 
@@ -94,6 +102,15 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Error creating order",
 			})
+		}
+
+		orderToPost := Order{OrderNumber: string(orderNumber)}
+		jsonData, _ := json.Marshal(orderToPost)
+
+		_, err = http.Post("http://localhost:8080/api/orders/", "application/json", bytes.NewBuffer(jsonData))
+		if err != nil {
+			fmt.Println(478237843782743287, err)
+			return err
 		}
 		return c.Status(fiber.StatusAccepted).JSON(fiber.Map{
 			"message": "Order created",
