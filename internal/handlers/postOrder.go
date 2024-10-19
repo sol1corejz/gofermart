@@ -49,10 +49,10 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 		orderNumber := c.Body()
 
 		authHeader := c.Get("Authorization")
-		token1 := strings.TrimPrefix(authHeader, "Bearer ")
+		token := strings.TrimPrefix(authHeader, "Bearer ")
 
-		token := c.Cookies("jwt")
-		userID := auth.GetUserID(token1)
+		//token := c.Cookies("jwt")
+		userID := auth.GetUserID(token)
 
 		if !luhnCheck.Match(orderNumber) {
 			logger.Log.Error("Invalid order number")
