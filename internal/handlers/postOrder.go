@@ -3,9 +3,7 @@ package handlers
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sol1corejz/gofermart/internal/auth"
 	"github.com/sol1corejz/gofermart/internal/logger"
@@ -104,17 +102,12 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		orderToPost := Order{OrderNumber: string(orderNumber)}
-		jsonData, _ := json.Marshal(orderToPost)
-
-		_, err = http.Post("http://localhost:8080/api/orders/", "application/json", bytes.NewBuffer(jsonData))
+		_, err = http.Post("http://localhost:8080/api/orders/", "text/plain", bytes.NewBuffer(orderNumber))
 		if err != nil {
-			fmt.Println(478237843782743287, err)
 			return err
 		}
 		return c.Status(fiber.StatusAccepted).JSON(fiber.Map{
 			"message": "Order created",
 		})
-
 	}
 }
