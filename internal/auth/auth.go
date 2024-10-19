@@ -15,9 +15,7 @@ type Claims struct {
 const TokenExp = time.Hour * 3
 const SecretKey = "supersecretkey"
 
-func GenerateToken() (string, error) {
-
-	userID := uuid.New()
+func GenerateToken(userID uuid.UUID) (string, error) {
 
 	tokenString, err := BuildJWTString(userID)
 

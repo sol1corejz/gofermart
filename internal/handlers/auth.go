@@ -50,7 +50,8 @@ func RegisterHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		token, err := auth.GenerateToken()
+		userID := uuid.New()
+		token, err := auth.GenerateToken(userID)
 		if err != nil {
 			logger.Log.Error("Error generating token: ", zap.Error(err))
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -65,8 +66,6 @@ func RegisterHandler(c *fiber.Ctx) error {
 				"error": "Internal server error",
 			})
 		}
-
-		userID := uuid.New()
 
 		err = storage.CreateUser(ctx, userID.String(), request.Login, string(hashedPassword))
 		if err != nil {
@@ -133,7 +132,7 @@ func LoginHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		token, err := auth.GenerateToken()
+		token, err := auth.GenerateToken(existingUser.ID)
 		if err != nil {
 			logger.Log.Error("Error generating token: ", zap.Error(err))
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
