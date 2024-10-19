@@ -67,7 +67,6 @@ func RegisterHandler(c *fiber.Ctx) error {
 		}
 
 		userID := uuid.New()
-		auth.UserUUID = userID
 
 		err = storage.CreateUser(ctx, userID.String(), request.Login, string(hashedPassword))
 		if err != nil {
@@ -133,8 +132,6 @@ func LoginHandler(c *fiber.Ctx) error {
 				"error": "Wrong login or password",
 			})
 		}
-
-		auth.UserUUID = existingUser.ID
 
 		token, err := auth.GenerateToken()
 		if err != nil {
