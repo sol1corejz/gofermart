@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/sol1corejz/gofermart/internal/logger"
@@ -19,8 +18,6 @@ const SecretKey = "supersecretkey"
 func GenerateToken() (string, error) {
 
 	userID := uuid.New()
-
-	fmt.Println(33333, userID)
 
 	tokenString, err := BuildJWTString(userID)
 
@@ -67,9 +64,6 @@ func GetUserID(tokenString string) uuid.UUID {
 	if claims.UserID == uuid.Nil {
 		logger.Log.Warn("Parsed UserID is nil")
 	}
-
-	fmt.Println(1111111, claims)
-	fmt.Println(2222222, claims.UserID)
 
 	logger.Log.Info("Token is valid")
 	return claims.UserID
