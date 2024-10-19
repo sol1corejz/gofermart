@@ -9,7 +9,6 @@ import (
 	"github.com/sol1corejz/gofermart/internal/storage"
 	"go.uber.org/zap"
 	"regexp"
-	"strings"
 	"time"
 )
 
@@ -48,10 +47,7 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 	default:
 		orderNumber := c.Body()
 
-		authHeader := c.Get("Authorization")
-		token := strings.TrimPrefix(authHeader, "Bearer ")
-
-		//token := c.Cookies("jwt")
+		token := c.Cookies("jwt")
 		userID := auth.GetUserID(token)
 
 		if !luhnCheck.Match(orderNumber) {
