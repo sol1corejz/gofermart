@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sol1corejz/gofermart/internal/auth"
 	"github.com/sol1corejz/gofermart/internal/logger"
@@ -45,8 +44,6 @@ func WithdrawHandler(c *fiber.Ctx) error {
 				"error": "Invalid request body",
 			})
 		}
-
-		fmt.Println(2432323232323232, request)
 
 		if balance.CurrentBalance < request.Sum {
 			return c.Status(fiber.StatusPaymentRequired).JSON(fiber.Map{
