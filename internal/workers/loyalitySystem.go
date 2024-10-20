@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/sol1corejz/gofermart/cmd/config"
+	"github.com/sol1corejz/gofermart/internal/auth"
 	"github.com/sol1corejz/gofermart/internal/logger"
 	"github.com/sol1corejz/gofermart/internal/models"
 	"github.com/sol1corejz/gofermart/internal/storage"
@@ -112,7 +113,7 @@ func updateOrderStatus(orderID int, loyaltyResp LoyaltyResponse) {
 	case <-ctx.Done():
 		logger.Log.Info("Cancel updating orders")
 	default:
-		err := storage.UpdateOrder(ctx, orderID, newStatus, accrual)
+		err := storage.UpdateOrder(ctx, orderID, newStatus, accrual, auth.UserID)
 		if err != nil {
 			logger.Log.Error("Failed to update orders", zap.Error(err))
 		}

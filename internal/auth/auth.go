@@ -12,6 +12,8 @@ type Claims struct {
 	UserID uuid.UUID
 }
 
+var UserID uuid.UUID
+
 const TokenExp = time.Hour * 3
 const SecretKey = "supersecretkey"
 
