@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/sol1corejz/gofermart/cmd/config"
@@ -171,6 +172,8 @@ func GetUserOrders(ctx context.Context, UUID uuid.UUID) ([]models.Order, error) 
 }
 
 func GetOrderByNumber(ctx context.Context, orderNumber string) (models.Order, error) {
+
+	fmt.Println(784387487247823, orderNumber)
 
 	var order models.Order
 
