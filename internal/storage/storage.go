@@ -194,7 +194,7 @@ func GetUserBalance(ctx context.Context, UUID uuid.UUID) (models.UserBalance, er
 
 	err := DB.QueryRowContext(ctx, `
 		SELECT * FROM user_balances WHERE user_id = $1;
-	`, UUID).Scan(&balance.UserID, &balance.CurrentBalance, &balance.WithdrawnTotal)
+	`, UUID).Scan(&balance.ID, &balance.UserID, &balance.CurrentBalance, &balance.WithdrawnTotal)
 
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
