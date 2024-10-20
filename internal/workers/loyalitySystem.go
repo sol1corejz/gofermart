@@ -77,7 +77,7 @@ func queryLoyaltySystem(orderNumber string) (LoyaltyResponse, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	fmt.Println("532167362173672167372 response Body:", string(body))
 
 	var loyaltyResp LoyaltyResponse
