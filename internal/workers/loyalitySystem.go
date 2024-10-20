@@ -8,6 +8,7 @@ import (
 	"github.com/sol1corejz/gofermart/internal/models"
 	"github.com/sol1corejz/gofermart/internal/storage"
 	"go.uber.org/zap"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -76,11 +77,14 @@ func queryLoyaltySystem(orderNumber string) (LoyaltyResponse, error) {
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("532167362173672167372 response Body:", resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	fmt.Println("532167362173672167372 response Body:", string(body))
 
 	var loyaltyResp LoyaltyResponse
-	if err := json.NewDecoder(resp.Body).Decode(&loyaltyResp); err != nil {
-		return LoyaltyResponse{}, fmt.Errorf("failed to decode response: %v", err)
+	err = json.Unmarshal(body, &loyaltyResp)
+	if err != nil {
+		logger.Log.Error("Failed to decode response", zap.Error(err))
+		return LoyaltyResponse{}, fmt.Errorf("failed to decode response: %w", err)
 	}
 
 	return loyaltyResp, nil
