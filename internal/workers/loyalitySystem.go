@@ -23,7 +23,7 @@ type LoyaltyResponse struct {
 
 const ExternalLoyaltyServiceURL = "http://localhost:8080/api/orders/"
 
-const WorkerInterval = 5 * time.Second
+const WorkerInterval = 60 * time.Second
 
 func InitLoyaltySystem() {
 	go startWorker()
@@ -46,7 +46,7 @@ func checkOrdersForProcessing() {
 	case <-ctx.Done():
 		logger.Log.Info("Cancelling orders")
 	default:
-		orders, err := storage.GetAllOrders(ctx)
+		orders, err := storage.GetAllUnprocessedOrders(ctx)
 
 		if err != nil {
 			logger.Log.Error("Error getting orders", zap.Error(err))

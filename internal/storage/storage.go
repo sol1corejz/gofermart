@@ -269,11 +269,11 @@ func CreateWithdrawal(ctx context.Context, userID uuid.UUID, order string, sum f
 	return nil
 }
 
-func GetAllOrders(ctx context.Context) ([]models.Order, error) {
+func GetAllUnprocessedOrders(ctx context.Context) ([]models.Order, error) {
 	var orders []models.Order
 
 	rows, err := DB.QueryContext(ctx, `
-		SELECT * FROM orders;
+		SELECT * FROM orders WHERE status NOT IN ('INVALID', 'PROCESSED');;
 	`)
 
 	if err != nil {
