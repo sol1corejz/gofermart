@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sol1corejz/gofermart/internal/auth"
 	"github.com/sol1corejz/gofermart/internal/logger"
@@ -50,7 +49,6 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 
 		token := c.Cookies("jwt")
 		userID := auth.GetUserID(token)
-		fmt.Println(111111, userID)
 
 		if !luhnCheck.Match(orderNumber) {
 			logger.Log.Error("Invalid order number")
