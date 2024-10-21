@@ -7,7 +7,6 @@ import (
 	"github.com/sol1corejz/gofermart/internal/storage" // Путь к вашему пакету работы с базой данных
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 type RegisterRequest struct {
@@ -37,14 +36,6 @@ func RegisterHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	token, err := auth.GenerateToken()
-	if err != nil {
-		logger.Log.Error("Error generating token: ", zap.Error(err))
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Internal server error",
-		})
-	}
-
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
 		logger.Log.Error("Error hashing password: ", zap.Error(err))
@@ -62,14 +53,16 @@ func RegisterHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	c.Cookie(&fiber.Cookie{
-		Name:     "jwt",
-		Value:    token,
-		Expires:  time.Now().Add(auth.TokenExp),
-		HTTPOnly: true,
-	})
+	token, err := auth.GenerateToken()
+	if err != nil {
+		logger.Log.Error("Error generating token: ", zap.Error(err))
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Internal server error",
+		})
+	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "User registered successfully",
+		"token":   token,
 	})
 }
