@@ -18,6 +18,7 @@ var (
 	DB                     *sql.DB
 	ErrConnectionFailed    = errors.New("db connection failed")
 	ErrCreatingTableFailed = errors.New("creating table failed")
+	ErrNoSuchOrder         = errors.New("no such order")
 )
 
 func Init() error {
@@ -174,8 +175,6 @@ func GetOrderByNumber(ctx context.Context, orderNumber string) (models.Order, er
 
 	var order models.Order
 
-	fmt.Println(1111, orderNumber)
-
 	err := DB.QueryRowContext(ctx, `
 		SELECT * FROM orders WHERE order_number = $1;
 	`, orderNumber).Scan(&order.ID, &order.UserID, &order.OrderNumber, &order.Status, &order.Accrual, &order.UploadedAt)
@@ -184,6 +183,9 @@ func GetOrderByNumber(ctx context.Context, orderNumber string) (models.Order, er
 	fmt.Println(3123123312312, err)
 
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Order{}, ErrNoSuchOrder
+		}
 		return models.Order{}, err
 	}
 
