@@ -60,10 +60,6 @@ func GetUserID(tokenString string) uuid.UUID {
 		return uuid.Nil
 	}
 
-	if claims.UserID == uuid.Nil {
-		logger.Log.Warn("Parsed UserID is nil")
-	}
-
 	logger.Log.Info("Token is valid")
 	return claims.UserID
 }
