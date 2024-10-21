@@ -20,10 +20,7 @@ func GenerateToken() (string, error) {
 
 	userID := uuid.New()
 
-	fmt.Println(33333, userID)
-
 	tokenString, err := BuildJWTString(userID)
-
 	if err != nil {
 		return "", err
 	}
