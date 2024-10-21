@@ -109,7 +109,7 @@ func updateOrderStatus(orderID int, loyaltyResp LoyaltyResponse) {
 
 	select {
 	case <-ctx.Done():
-		logger.Log.Info("Cancel updating orders")
+		logger.Log.Info("Cancell updating orders")
 	default:
 		err := storage.UpdateOrder(ctx, orderID, newStatus, accrual)
 		if err != nil {
