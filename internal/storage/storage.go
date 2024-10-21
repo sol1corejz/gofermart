@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/sol1corejz/gofermart/cmd/config"
@@ -41,10 +42,10 @@ func Init() error {
 		);`,
 		`CREATE TABLE IF NOT EXISTS orders (
 			id SERIAL PRIMARY KEY,
-			user_id UUID REFERENCES users(id) NOT NULL,
+			user_id UUID REFERENCES users(id),
 			order_number VARCHAR(255) UNIQUE NOT NULL,
 			status VARCHAR(20) NOT NULL,
-			accrual DECIMAL(10, 2) DEFAULT NULL,
+			accrual DECIMAL(10, 2) DEFAULT 0,
 			uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);`,
 		`CREATE TABLE IF NOT EXISTS user_balances (
@@ -101,6 +102,7 @@ func CreateUser(ctx context.Context, userID string, login string, passwordHash s
 }
 
 func CreateOrder(ctx context.Context, userID string, orderNumber string) error {
+	fmt.Println(111111111111, userID)
 	_, err := DB.ExecContext(ctx, `
         INSERT INTO orders (user_id, order_number, status) VALUES ($1, $2, $3) ON CONFLICT (order_number) DO NOTHING;
     `, userID, orderNumber, models.PROCESSING)
