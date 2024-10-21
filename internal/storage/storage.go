@@ -300,25 +300,8 @@ func GetAllUnprocessedOrders(ctx context.Context) ([]models.Order, error) {
 	return orders, nil
 }
 
-func UpdateOrder(ctx context.Context, orderID int, orderStatus string, orderAccrual float64, userID uuid.UUID) error {
-	tx, err := DB.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	_, err = tx.ExecContext(ctx, `UPDATE orders SET status = $1, accrual = $2 WHERE id = $3`, orderStatus, orderAccrual, orderID)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	_, err = tx.ExecContext(ctx, `UPDATE user_balances SET current_balance = $1 WHERE user_id = $2`, orderAccrual, userID)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	err = tx.Commit()
+func UpdateOrder(ctx context.Context, orderID int, orderStatus string, orderAccrual float64) error {
+	_, err := DB.ExecContext(ctx, `UPDATE orders SET status = $1, accrual = $2 WHERE id = $3`, orderStatus, orderAccrual, orderID)
 	if err != nil {
 		return err
 	}

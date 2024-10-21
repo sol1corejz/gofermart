@@ -77,8 +77,6 @@ func RegisterHandler(c *fiber.Ctx) error {
 
 		tokenstorage.AddToken(token)
 
-		auth.UserID = userID
-
 		c.Cookie(&fiber.Cookie{
 			Name:     "jwt",
 			Value:    token,
@@ -143,8 +141,6 @@ func LoginHandler(c *fiber.Ctx) error {
 		}
 
 		tokenstorage.AddToken(token)
-
-		auth.UserID = existingUser.ID
 
 		c.Cookie(&fiber.Cookie{
 			Name:     "jwt",
