@@ -3,13 +3,13 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sol1corejz/gofermart/internal/auth"
 	"github.com/sol1corejz/gofermart/internal/logger"
 	"github.com/sol1corejz/gofermart/internal/storage"
 	"go.uber.org/zap"
 	"regexp"
-	"strings"
 	"time"
 )
 
@@ -48,11 +48,13 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 	default:
 		orderNumber := c.Body()
 
-		authHeader := c.Get("Authorization")
-		token1 := strings.TrimPrefix(authHeader, "Bearer ")
+		headers := c.GetReqHeaders()
 
 		token := c.Cookies("jwt")
-		userID := auth.GetUserID(token1)
+		userID := auth.GetUserID(token)
+		fmt.Println(111111, userID)
+		fmt.Println(222222, token)
+		fmt.Println(333333, headers)
 
 		if !luhnCheck.Match(orderNumber) {
 			logger.Log.Error("Invalid order number")
