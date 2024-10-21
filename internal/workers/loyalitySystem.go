@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/sol1corejz/gofermart/cmd/config"
 	"github.com/sol1corejz/gofermart/internal/logger"
 	"github.com/sol1corejz/gofermart/internal/models"
 	"github.com/sol1corejz/gofermart/internal/storage"
@@ -23,7 +22,7 @@ type LoyaltyResponse struct {
 	Accrual float64 `json:"accrual,omitempty"`
 }
 
-var ExternalLoyaltyServiceURL = config.AccrualSystemAddress + "/api/orders/"
+const ExternalLoyaltyServiceURL = "http://localhost:8080/api/orders/"
 
 const WorkerInterval = 5 * time.Second
 
