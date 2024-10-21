@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/sol1corejz/gofermart/cmd/config"
@@ -102,7 +101,7 @@ func CreateUser(ctx context.Context, userID string, login string, passwordHash s
 }
 
 func CreateOrder(ctx context.Context, userID string, orderNumber string) error {
-	fmt.Println(111111111111, userID)
+
 	_, err := DB.ExecContext(ctx, `
         INSERT INTO orders (user_id, order_number, status) VALUES ($1, $2, $3) ON CONFLICT (order_number) DO NOTHING;
     `, userID, orderNumber, models.PROCESSING)
