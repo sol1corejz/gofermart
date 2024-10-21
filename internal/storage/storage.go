@@ -44,14 +44,14 @@ func Init() error {
 			user_id UUID NOT NULL REFERENCES users(id),
 			order_number VARCHAR(255) UNIQUE NOT NULL,
 			status VARCHAR(20) NOT NULL,
-			accrual DECIMAL(10, 2) DEFAULT 0.00,
+			accrual DECIMAL(10, 2) DEFAULT 0,
 			uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);`,
 		`CREATE TABLE IF NOT EXISTS user_balances (
     		id SERIAL PRIMARY KEY NOT NULL,
 			user_id UUID NOT NULL REFERENCES users(id),
-			current_balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-			withdrawn_total DECIMAL(10, 2) NOT NULL DEFAULT 0.00
+			current_balance DECIMAL(10, 2) NOT NULL DEFAULT 0,
+			withdrawn_total DECIMAL(10, 2) NOT NULL DEFAULT 0
 		);`,
 		`CREATE TABLE IF NOT EXISTS withdrawals (
 			id SERIAL PRIMARY KEY NOT NULL,
@@ -90,33 +90,10 @@ func GetUserByLogin(ctx context.Context, login string) (models.User, error) {
 }
 
 func CreateUser(ctx context.Context, userID string, login string, passwordHash string) error {
+	_, err := DB.ExecContext(ctx, `
+		INSERT INTO users (id, login, password_hash) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING;
+	`, userID, login, passwordHash)
 
-	tx, err := DB.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	var uID string
-
-	err = tx.QueryRowContext(ctx, `
-		INSERT INTO users (id, login, password_hash) VALUES ($1, $2, $3) RETURNING id;
-	`, userID, login, passwordHash).Scan(&uID)
-
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	_, err = tx.ExecContext(ctx, `
-		INSERT INTO user_balances (user_id) VALUES ($1);
-	`, uID)
-
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	err = tx.Commit()
 	if err != nil {
 		return err
 	}
