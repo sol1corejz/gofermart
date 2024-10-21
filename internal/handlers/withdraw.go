@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sol1corejz/gofermart/internal/auth"
 	"github.com/sol1corejz/gofermart/internal/logger"
@@ -33,20 +33,17 @@ func WithdrawHandler(c *fiber.Ctx) error {
 
 		userID := auth.GetUserID(token)
 
-		balance, err := storage.GetUserBalance(ctx, userID)
-
-		if err != nil {
-			logger.Log.Error("Error getting user balance", zap.Error(err))
-			return c.SendStatus(fiber.StatusInternalServerError)
-		}
-
-		if err = c.BodyParser(&request); err != nil {
+		if err := c.BodyParser(&request); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid request body",
 			})
 		}
 
-		fmt.Println("REQUEST", request)
+		balance, err := storage.GetUserBalance(ctx, userID)
+		if err != nil {
+			logger.Log.Error("Error getting user balance", zap.Error(err))
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
 
 		if balance.CurrentBalance < request.Sum {
 			return c.Status(fiber.StatusPaymentRequired).JSON(fiber.Map{
@@ -54,10 +51,10 @@ func WithdrawHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		_, err = storage.GetOrderByNumber(ctx, request.Order)
+		_, err := storage.GetOrderByNumber(ctx, request.Order)
 
 		if err != nil {
-			if errors.Is(err, storage.ErrNoSuchOrder) {
+			if errors.Is(err, sql.ErrNoRows) {
 				logger.Log.Warn("No such order found", zap.Error(err))
 				return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
 					"error": "Order does not exist",
