@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/sol1corejz/gofermart/cmd/config"
@@ -174,14 +173,9 @@ func GetOrderByNumber(ctx context.Context, orderNumber string) (models.Order, er
 
 	var order models.Order
 
-	fmt.Println(1111, orderNumber)
-
 	err := DB.QueryRowContext(ctx, `
 		SELECT * FROM orders WHERE order_number = $1;
 	`, orderNumber).Scan(&order.ID, &order.UserID, &order.OrderNumber, &order.Status, &order.Accrual, &order.UploadedAt)
-
-	fmt.Println(3123123312312, order)
-	fmt.Println(3123123312312, err)
 
 	if err != nil {
 		return models.Order{}, err
