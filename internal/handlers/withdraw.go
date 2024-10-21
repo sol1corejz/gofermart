@@ -46,7 +46,7 @@ func WithdrawHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		fmt.Println(1111111111111111111111, request)
+		fmt.Println("REQUEST", request)
 
 		if balance.CurrentBalance < request.Sum {
 			return c.Status(fiber.StatusPaymentRequired).JSON(fiber.Map{
