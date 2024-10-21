@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/sol1corejz/gofermart/internal/auth" // Путь к вашему auth пакету
@@ -89,10 +88,9 @@ func RegisterHandler(c *fiber.Ctx) error {
 
 		c.Set("Authorization", "Bearer "+token)
 
-		fmt.Println(1234567890, token)
-
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"message": "User registered successfully",
+			"token":   token,
 		})
 	}
 }
@@ -158,10 +156,9 @@ func LoginHandler(c *fiber.Ctx) error {
 
 		c.Set("Authorization", "Bearer "+token)
 
-		fmt.Println(1234567890, token)
-
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"message": "User authorized successfully",
+			"token":   token,
 		})
 	}
 }
