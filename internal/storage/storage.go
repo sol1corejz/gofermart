@@ -213,31 +213,19 @@ func GetUserWithdrawals(ctx context.Context, UUID uuid.UUID) ([]models.Withdrawa
 }
 
 func CreateWithdrawal(ctx context.Context, userID uuid.UUID, order string, sum float64) error {
-	tx, err := DB.BeginTx(ctx, nil) // Начинаем транзакцию
-	if err != nil {
-		return err
-	}
-
-	_, err = tx.ExecContext(ctx, `
+	_, err := DB.ExecContext(ctx, `
 		INSERT INTO withdrawals (user_id, order_number, sum, processed_at) 
 		VALUES ($1, $2, $3, $4)
 	`, userID, order, sum, time.Now().Format(time.RFC3339))
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
-	_, err = tx.ExecContext(ctx, `
+	_, err = DB.ExecContext(ctx, `
 		UPDATE user_balances 
 		SET current_balance = current_balance - $1, withdrawn_total = withdrawn_total + $1 
 		WHERE user_id = $2
 	`, sum, userID)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	err = tx.Commit()
 	if err != nil {
 		return err
 	}
