@@ -1,11 +1,9 @@
 package storage
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/sol1corejz/gofermart/cmd/config"
 	"github.com/sol1corejz/gofermart/internal/logger"
@@ -70,11 +68,11 @@ func Init() error {
 	return nil
 }
 
-func GetUserByLogin(ctx context.Context, login string) (models.User, error) {
+func GetUserByLogin(login string) (models.User, error) {
 
 	var existingUser models.User
 
-	err := DB.QueryRowContext(ctx, `
+	err := DB.QueryRow(`
 		SELECT * FROM users WHERE login = $1;
 	`, login).Scan(&existingUser.ID, &existingUser.Login, &existingUser.PasswordHash, &existingUser.CreatedAt)
 
@@ -87,9 +85,9 @@ func GetUserByLogin(ctx context.Context, login string) (models.User, error) {
 	return existingUser, nil
 }
 
-func CreateUser(ctx context.Context, userID string, login string, passwordHash string) error {
+func CreateUser(userID string, login string, passwordHash string) error {
 	fmt.Printf("Creating user %s with login %s with password %s\n", userID, login, passwordHash)
-	_, err := DB.ExecContext(ctx, `
+	_, err := DB.Exec(`
 		INSERT INTO users (id, login, password_hash) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING;
 	`, userID, login, passwordHash)
 
@@ -98,36 +96,4 @@ func CreateUser(ctx context.Context, userID string, login string, passwordHash s
 	}
 
 	return nil
-}
-
-func GetUserOrders(ctx context.Context, UUID uuid.UUID) ([]models.Order, error) {
-
-	var orders []models.Order
-
-	rows, err := DB.QueryContext(ctx, `
-		SELECT * FROM orders WHERE user_id = $1;
-	`, UUID)
-
-	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			return []models.Order{}, err
-		}
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		var order models.Order
-		err = rows.Scan(&order.ID, &order.UserID, &order.OrderNumber, &order.Status, &order.Accrual, &order.UploadedAt)
-		if err != nil {
-			return nil, err
-		}
-		orders = append(orders, order)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return orders, nil
 }
