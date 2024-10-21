@@ -7,7 +7,6 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/sol1corejz/gofermart/cmd/config"
 	"github.com/sol1corejz/gofermart/internal/logger"
-	"github.com/sol1corejz/gofermart/internal/models"
 	"go.uber.org/zap"
 )
 
@@ -68,21 +67,25 @@ func Init() error {
 	return nil
 }
 
-func GetUserByLogin(login string) (models.User, error) {
+func GetUserByLogin(login string) (string, error) {
 
-	var existingUser models.User
+	existingUserID := ""
 
 	err := DB.QueryRow(`
-		SELECT * FROM users WHERE login = $1;
-	`, login).Scan(&existingUser.ID, &existingUser.Login, &existingUser.PasswordHash, &existingUser.CreatedAt)
+		SELECT id FROM users WHERE login = $1;
+	`, login).Scan(&existingUserID)
 
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			return models.User{}, err
+			return "", err
 		}
 	}
 
-	return existingUser, nil
+	if existingUserID != "" {
+		return existingUserID, nil
+	}
+
+	return existingUserID, nil
 }
 
 func CreateUser(userID string, login string, passwordHash string) error {
