@@ -57,12 +57,12 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		if !isValidLuhn(string(orderNumber)) {
-			logger.Log.Error("Invalid order number")
-			return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
-				"error": "Invalid order number",
-			})
-		}
+		//if !isValidLuhn(string(orderNumber)) {
+		//	logger.Log.Error("Invalid order number")
+		//	return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+		//		"error": "Invalid order number",
+		//	})
+		//}
 
 		order, err := storage.GetOrderByNumber(ctx, string(orderNumber))
 
