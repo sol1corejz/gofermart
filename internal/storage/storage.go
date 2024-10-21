@@ -131,20 +131,3 @@ func GetUserOrders(ctx context.Context, UUID uuid.UUID) ([]models.Order, error) 
 
 	return orders, nil
 }
-
-func GetUserBalance(ctx context.Context, UUID uuid.UUID) (models.UserBalance, error) {
-
-	var balance models.UserBalance
-
-	err := DB.QueryRowContext(ctx, `
-		SELECT * FROM user_balances WHERE user_id = $1;
-	`, UUID).Scan(&balance.UserID, &balance.CurrentBalance, &balance.WithdrawnTotal)
-
-	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			return models.UserBalance{}, err
-		}
-	}
-
-	return balance, nil
-}
