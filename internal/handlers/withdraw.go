@@ -51,7 +51,7 @@ func WithdrawHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		_, err := storage.GetOrderByNumber(ctx, request.Order)
+		_, err = storage.GetOrderByNumber(ctx, request.Order)
 
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {

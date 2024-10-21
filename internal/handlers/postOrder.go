@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"github.com/gofiber/fiber/v2"
@@ -80,7 +81,7 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 		order, err := storage.GetOrderByNumber(ctx, string(orderNumber))
 
 		if err != nil {
-			if !errors.Is(err, storage.ErrNoSuchOrder) {
+			if !errors.Is(err, sql.ErrNoRows) {
 				logger.Log.Error("Error checking order", zap.Error(err))
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 					"error": "Error checking order",
