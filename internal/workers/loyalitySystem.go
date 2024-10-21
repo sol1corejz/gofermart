@@ -69,7 +69,6 @@ func checkOrdersForProcessing() {
 
 func queryLoyaltySystem(orderNumber string) (LoyaltyResponse, error) {
 	url := fmt.Sprintf("%s%s", ExternalLoyaltyServiceURL, orderNumber)
-	logger.Log.Info("Querying loyalty system", zap.String("url", url))
 	resp, err := http.Get(url)
 	if err != nil {
 		return LoyaltyResponse{}, fmt.Errorf("HTTP request failed: %v", err)
@@ -84,6 +83,8 @@ func queryLoyaltySystem(orderNumber string) (LoyaltyResponse, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&loyaltyResp); err != nil {
 		return LoyaltyResponse{}, fmt.Errorf("failed to decode response: %v", err)
 	}
+
+	fmt.Println(11111111111, loyaltyResp)
 
 	return loyaltyResp, nil
 }
