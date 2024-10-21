@@ -44,7 +44,7 @@ func Init() error {
 			user_id UUID REFERENCES users(id) NOT NULL,
 			order_number VARCHAR(255) UNIQUE NOT NULL,
 			status VARCHAR(20) NOT NULL,
-			accrual DECIMAL(10, 2) DEFAULT 0,
+			accrual DECIMAL(10, 2) DEFAULT NULL,
 			uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);`,
 		`CREATE TABLE IF NOT EXISTS user_balances (
