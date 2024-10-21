@@ -23,6 +23,8 @@ type LoyaltyResponse struct {
 	Accrual float64 `json:"accrual,omitempty"`
 }
 
+var ExternalLoyaltyServiceURL = config.AccrualSystemAddress + "/api/orders/"
+
 const WorkerInterval = 5 * time.Second
 
 func InitLoyaltySystem() {
@@ -68,7 +70,7 @@ func checkOrdersForProcessing() {
 }
 
 func queryLoyaltySystem(orderNumber string) (LoyaltyResponse, error) {
-	url := fmt.Sprintf("%s%s%s", config.AccrualSystemAddress, "/api/orders/", orderNumber)
+	url := fmt.Sprintf("%s%s", ExternalLoyaltyServiceURL, orderNumber)
 	logger.Log.Info("Querying loyalty system", zap.String("url", url))
 	resp, err := http.Get(url)
 	if err != nil {
