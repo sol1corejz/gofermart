@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/sol1corejz/gofermart/cmd/config"
@@ -89,21 +90,10 @@ func GetUserByLogin(ctx context.Context, login string) (models.User, error) {
 }
 
 func CreateUser(ctx context.Context, userID string, login string, passwordHash string) error {
+	fmt.Printf("Creating user %s with login %s with password %s\n", userID, login, passwordHash)
 	_, err := DB.ExecContext(ctx, `
 		INSERT INTO users (id, login, password_hash) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING;
 	`, userID, login, passwordHash)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func CreateOrder(ctx context.Context, userID string, orderNumber string) error {
-	_, err := DB.ExecContext(ctx, `
-		INSERT INTO orders (user_id, order_number, status) VALUES ($1, $2, $3);
-	`, userID, orderNumber, models.PROCESSING)
 
 	if err != nil {
 		return err
@@ -183,7 +173,7 @@ func GetUserWithdrawals(ctx context.Context, UUID uuid.UUID) ([]models.Withdrawa
 	var withdrawals []models.Withdrawal
 
 	rows, err := DB.QueryContext(ctx, `
-		SELECT * FROM withdrawals WHERE user_id = $1 ORDER BY processed_at;
+		SELECT * FROM withdrawals WHERE user_id = $1;
 	`, UUID)
 
 	if err != nil {
@@ -214,7 +204,7 @@ func CreateWithdrawal(ctx context.Context, userID uuid.UUID, order string, sum f
 	_, err := DB.ExecContext(ctx, `
 		INSERT INTO withdrawals (user_id, order_number, sum, processed_at) 
 		VALUES ($1, $2, $3, $4)
-	`, userID, order, sum, time.Now().Format(time.RFC3339))
+	`, userID, order, sum, time.Now())
 	if err != nil {
 		return err
 	}
