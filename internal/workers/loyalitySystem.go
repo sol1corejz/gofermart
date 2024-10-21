@@ -76,8 +76,6 @@ func queryLoyaltySystem(orderNumber string) (LoyaltyResponse, error) {
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("532167362173672167372 response Body:", resp.Body)
-
 	var loyaltyResp LoyaltyResponse
 	if err := json.NewDecoder(resp.Body).Decode(&loyaltyResp); err != nil {
 		return LoyaltyResponse{}, fmt.Errorf("failed to decode response: %v", err)
