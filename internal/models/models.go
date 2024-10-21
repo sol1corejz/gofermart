@@ -30,7 +30,6 @@ type Order struct {
 }
 
 type UserBalance struct {
-	ID             int       `db:"id"`
 	UserID         uuid.UUID `db:"user_id"`
 	CurrentBalance float64   `db:"current_balance"`
 	WithdrawnTotal float64   `db:"withdrawn_total"`
