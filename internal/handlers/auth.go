@@ -7,7 +7,7 @@ import (
 	"github.com/sol1corejz/gofermart/internal/auth" // Путь к вашему auth пакету
 	"github.com/sol1corejz/gofermart/internal/logger"
 	"github.com/sol1corejz/gofermart/internal/storage" // Путь к вашему пакету работы с базой данных
-	"github.com/sol1corejz/gofermart/internal/tokenstorage"
+	"github.com/sol1corejz/gofermart/internal/tokenStorage"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"time"
@@ -77,7 +77,7 @@ func RegisterHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		tokenstorage.AddToken(token)
+		tokenStorage.AddToken(token)
 
 		c.Cookie(&fiber.Cookie{
 			Name:     "jwt",
@@ -142,7 +142,7 @@ func LoginHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		tokenstorage.AddToken(token)
+		tokenStorage.AddToken(token)
 
 		c.Cookie(&fiber.Cookie{
 			Name:     "jwt",

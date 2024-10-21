@@ -34,15 +34,15 @@ func WithdrawHandler(c *fiber.Ctx) error {
 
 		balance, err := storage.GetUserBalance(ctx, userID)
 
-		if err != nil {
-			logger.Log.Error("Error getting user balance", zap.Error(err))
-			return c.SendStatus(fiber.StatusInternalServerError)
-		}
-
 		if err = c.BodyParser(&request); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid request body",
 			})
+		}
+
+		if err != nil {
+			logger.Log.Error("Error getting user balance", zap.Error(err))
+			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 
 		if balance.CurrentBalance < request.Sum {

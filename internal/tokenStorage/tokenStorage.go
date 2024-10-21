@@ -1,4 +1,4 @@
-package tokenstorage
+package tokenStorage
 
 var token = ""
 
