@@ -89,7 +89,7 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		err = storage.CreateOrder(ctx, userID, string(orderNumber))
+		err = storage.CreateOrder(ctx, userID.String(), string(orderNumber))
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Error creating order",
