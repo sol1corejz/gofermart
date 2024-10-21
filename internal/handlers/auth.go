@@ -86,8 +86,6 @@ func RegisterHandler(c *fiber.Ctx) error {
 			HTTPOnly: true,
 		})
 
-		c.Set("Authorization", "Bearer "+token)
-
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"message": "User registered successfully",
 		})
@@ -152,8 +150,6 @@ func LoginHandler(c *fiber.Ctx) error {
 			Expires:  time.Now().Add(auth.TokenExp),
 			HTTPOnly: true,
 		})
-
-		c.Set("Authorization", "Bearer "+token)
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"message": "User authorized successfully",
