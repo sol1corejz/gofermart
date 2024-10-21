@@ -48,13 +48,9 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 	default:
 		orderNumber := c.Body()
 
-		headers := c.GetReqHeaders()
-
 		token := c.Cookies("jwt")
 		userID := auth.GetUserID(token)
 		fmt.Println(111111, userID)
-		fmt.Println(222222, token)
-		fmt.Println(333333, headers)
 
 		if !luhnCheck.Match(orderNumber) {
 			logger.Log.Error("Invalid order number")
