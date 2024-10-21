@@ -173,14 +173,13 @@ func GetUserOrders(ctx context.Context, UUID uuid.UUID) ([]models.Order, error) 
 
 func GetOrderByNumber(ctx context.Context, orderNumber string) (models.Order, error) {
 
+	fmt.Println(784387487247823, orderNumber)
+
 	var order models.Order
 
 	err := DB.QueryRowContext(ctx, `
 		SELECT * FROM orders WHERE order_number = $1;
 	`, orderNumber).Scan(&order.ID, &order.UserID, &order.OrderNumber, &order.Status, &order.Accrual, &order.UploadedAt)
-
-	fmt.Println(3123123312312, order)
-	fmt.Println(3123123312312, err)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
