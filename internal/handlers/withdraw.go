@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sol1corejz/gofermart/internal/auth"
 	"github.com/sol1corejz/gofermart/internal/logger"
@@ -46,8 +45,6 @@ func WithdrawHandler(c *fiber.Ctx) error {
 			})
 		}
 
-		fmt.Println(1111111111111111111111, request)
-
 		if balance.CurrentBalance < request.Sum {
 			return c.Status(fiber.StatusPaymentRequired).JSON(fiber.Map{
 				"error": "Insufficient funds",
@@ -58,15 +55,11 @@ func WithdrawHandler(c *fiber.Ctx) error {
 
 		if err != nil {
 			if errors.Is(err, storage.ErrNoSuchOrder) {
-				logger.Log.Warn("No such order found", zap.Error(err))
-				return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
-					"error": "Order does not exist",
-				})
+				logger.Log.Error("Error getting user order in db", zap.Error(err))
+				return c.SendStatus(fiber.StatusUnprocessableEntity)
 			}
-			logger.Log.Error("Database error while fetching order", zap.Error(err))
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Internal server error",
-			})
+			logger.Log.Error("Error getting user order", zap.Error(err))
+			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 
 		err = storage.CreateWithdrawal(ctx, userID, request.Order, request.Sum)
@@ -75,7 +68,6 @@ func WithdrawHandler(c *fiber.Ctx) error {
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 
-		logger.Log.Info("Withdrawal created successfully", zap.String("userID", userID.String()), zap.String("order", request.Order), zap.Float64("sum", request.Sum))
 		return c.SendStatus(fiber.StatusOK)
 	}
 }
