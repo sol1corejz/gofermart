@@ -89,6 +89,23 @@ func GetUserByLogin(ctx context.Context, login string) (models.User, error) {
 	return existingUser, nil
 }
 
+func GetUserByUUID(ctx context.Context, uuid string) (models.User, error) {
+
+	var existingUser models.User
+
+	err := DB.QueryRowContext(ctx, `
+		SELECT * FROM users WHERE id = $1;
+	`, uuid).Scan(&existingUser.ID, &existingUser.Login, &existingUser.PasswordHash, &existingUser.CreatedAt)
+
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return models.User{}, err
+		}
+	}
+
+	return existingUser, nil
+}
+
 func CreateUser(ctx context.Context, userID string, login string, passwordHash string) error {
 	_, err := DB.ExecContext(ctx, `
 		INSERT INTO users (id, login, password_hash) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING;

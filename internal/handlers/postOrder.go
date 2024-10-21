@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sol1corejz/gofermart/internal/auth"
 	"github.com/sol1corejz/gofermart/internal/logger"
@@ -49,6 +50,16 @@ func CreateOrderHandler(c *fiber.Ctx) error {
 
 		token := c.Cookies("jwt")
 		userID := auth.GetUserID(token)
+
+		user, err := storage.GetUserByUUID(ctx, userID.String())
+		if err != nil {
+			logger.Log.Error("No such user")
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "No such user",
+			})
+		}
+
+		fmt.Println(222222, user)
 
 		if !luhnCheck.Match(orderNumber) {
 			logger.Log.Error("Invalid order number")
