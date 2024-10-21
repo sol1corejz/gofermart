@@ -30,12 +30,6 @@ func RegisterHandler(c *fiber.Ctx) error {
 			"error": "Request timed out",
 		})
 	default:
-		if err := c.BodyParser(&request); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid request body",
-			})
-		}
-
 		existingUser, err := storage.GetUserByLogin(ctx, request.Login)
 		if err != nil {
 			logger.Log.Error("Error while querying user: ", zap.Error(err))

@@ -36,12 +36,12 @@ func GetOrdersHandler(c *fiber.Ctx) error {
 
 		if err != nil {
 			logger.Log.Error("Error getting user orders", zap.Error(err))
-			return c.SendStatus(fiber.StatusInternalServerError)
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{})
 		}
 
 		if len(orders) == 0 {
 			logger.Log.Info("No orders found")
-			return c.SendStatus(fiber.StatusNoContent)
+			return c.Status(fiber.StatusNoContent).JSON(fiber.Map{})
 		}
 
 		var response []OrderResponse
