@@ -34,27 +34,26 @@ func Init() error {
 
 	tables := []string{
 		`CREATE TABLE IF NOT EXISTS users (
-			id UUID PRIMARY KEY NOT NULL,
+			id UUID PRIMARY KEY,
 			login VARCHAR(255) UNIQUE NOT NULL,
 			password_hash VARCHAR(255) NOT NULL,
 			created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);`,
 		`CREATE TABLE IF NOT EXISTS orders (
-			id SERIAL PRIMARY KEY NOT NULL,
-			user_id UUID NOT NULL REFERENCES users(id),
+			id SERIAL PRIMARY KEY,
+			user_id UUID REFERENCES users(id) NOT NULL,
 			order_number VARCHAR(255) UNIQUE NOT NULL,
 			status VARCHAR(20) NOT NULL,
 			accrual DECIMAL(10, 2) DEFAULT 0,
 			uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);`,
 		`CREATE TABLE IF NOT EXISTS user_balances (
-    		id SERIAL PRIMARY KEY NOT NULL,
 			user_id UUID NOT NULL REFERENCES users(id),
 			current_balance DECIMAL(10, 2) NOT NULL DEFAULT 0,
 			withdrawn_total DECIMAL(10, 2) NOT NULL DEFAULT 0
 		);`,
 		`CREATE TABLE IF NOT EXISTS withdrawals (
-			id SERIAL PRIMARY KEY NOT NULL,
+			id SERIAL PRIMARY KEY,
 			user_id UUID NOT NULL REFERENCES users(id),
 			order_number VARCHAR(255) NOT NULL,
 			sum DECIMAL(10, 2) NOT NULL,
